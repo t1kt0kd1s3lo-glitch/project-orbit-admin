@@ -38,4 +38,23 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
       const r = await httpsRequest(`${ORBIT}/dashboard/shop/save`, {
-        meth
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Orbit-Admin": TOKEN },
+        body: JSON.stringify(req.body),
+      });
+      if (!r.ok) throw new Error("Orbit " + r.status);
+      return res.json({ ok: true });
+    } catch (e) { return res.status(502).json({ error: e.message }); }
+  }
+  if (req.method === "PUT") {
+    try {
+      const r = await httpsRequest(`${ORBIT}/dashboard/shop/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Orbit-Admin": TOKEN },
+      });
+      if (!r.ok) throw new Error("Orbit " + r.status);
+      return res.json({ ok: true });
+    } catch (e) { return res.status(502).json({ error: e.message }); }
+  }
+  res.status(405).end();
+}
