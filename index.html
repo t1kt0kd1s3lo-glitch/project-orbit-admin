@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orbit Admin Portal</title>
+    <title>Orbit Admin | v1.0</title>
     <style>
-        /* This CSS mimics the dark-mode variables I saw in your project files */
         :root {
             --bg: #0b0e11;
             --card: #15191e;
@@ -13,117 +12,149 @@
             --accent: #4d6eff;
             --text: #ffffff;
             --text-dim: #8b98a5;
+            --danger: #ff4d4d;
+            --success: #4ade80;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
             margin: 0;
             display: flex;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Sidebar */
+        /* Sidebar Navigation */
         nav {
-            width: 240px;
+            width: 260px;
             background: var(--card);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 30px 20px;
         }
 
         .nav-logo {
             font-weight: 900;
-            font-size: 1.5rem;
-            letter-spacing: 2px;
-            margin-bottom: 40px;
+            font-size: 1.6rem;
+            letter-spacing: 3px;
             color: var(--accent);
+            margin-bottom: 50px;
+            text-align: center;
         }
 
         .nav-item {
-            padding: 12px 15px;
-            border-radius: 8px;
+            padding: 14px 18px;
+            border-radius: 12px;
             cursor: pointer;
             color: var(--text-dim);
             transition: 0.2s;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         .nav-item:hover, .nav-item.active {
             background: rgba(77, 110, 255, 0.1);
-            color: var(--accent);
+            color: var(--text);
         }
 
-        /* Main Content */
+        /* Main View */
         main {
             flex: 1;
             padding: 40px;
             overflow-y: auto;
         }
 
-        .page-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .page-sub {
-            color: var(--text-dim);
-            margin-bottom: 30px;
-        }
-
-        /* Cards & Grid */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
+        .page-header { margin-bottom: 35px; }
+        .page-title { font-size: 2rem; font-weight: 800; margin: 0; }
+        .page-sub { color: var(--text-dim); margin-top: 5px; }
 
         .card {
             background: var(--card);
             border: 1px solid var(--border);
             padding: 24px;
-            border-radius: 12px;
+            border-radius: 16px;
+            margin-bottom: 24px;
         }
 
         .card-title {
             font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
             color: var(--text-dim);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
         }
 
-        .stat {
-            font-size: 2.2rem;
-            font-weight: 800;
+        /* Shop Grid */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        /* Forms */
-        input, textarea {
+        .shop-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            position: relative;
+            text-align: center;
+        }
+
+        .shop-item img {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .shop-item-name { font-size: 0.85rem; font-weight: 600; display: block; }
+        .shop-item-price { font-size: 0.8rem; color: #00C8FF; margin-top: 4px; display: block; }
+
+        .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Inputs & Buttons */
+        input, select {
             width: 100%;
             background: var(--bg);
             border: 1px solid var(--border);
             padding: 12px;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
             margin-bottom: 15px;
-            box-sizing: border-box;
+            outline: none;
         }
 
-        .btn {
+        .btn-purple {
             background: var(--accent);
             color: white;
             border: none;
             padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
+            border-radius: 10px;
+            font-weight: 700;
             cursor: pointer;
+            width: 100%;
         }
-
-        .btn:hover { opacity: 0.9; }
 
         .hidden { display: none; }
     </style>
@@ -132,78 +163,150 @@
 
     <nav>
         <div class="nav-logo">ORBIT</div>
-        <div class="nav-item active" data-target="page-home">Overview</div>
-        <div class="nav-item" data-target="page-shop">Shop Manager</div>
-        <div class="nav-item" data-target="page-tournaments">Tournaments</div>
-        <div class="nav-item" data-target="page-users">User Lookup</div>
+        <div class="nav-item active" onclick="showPage('shop')">Item Shop</div>
+        <div class="nav-item" onclick="showPage('tournaments')">Tournaments</div>
     </nav>
 
     <main>
         
-        <div id="page-home" class="page">
-            <div class="page-title">Server Overview</div>
-            <div class="page-sub">Live analytics from your C# backend</div>
-            
-            <div class="grid">
-                <div class="card">
-                    <div class="card-title">Players Online</div>
-                    <div class="stat" id="stat-online">0</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Total Accounts</div>
-                    <div class="stat" id="stat-total">0</div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Uptime</div>
-                    <div class="stat" style="font-size: 1.5rem; margin-top: 10px;">99.9%</div>
-                </div>
+        <div id="page-shop" class="page">
+            <div class="page-header">
+                <h1 class="page-title">Item Shop Manager</h1>
+                <p class="page-sub">Configure live rotation and item pricing</p>
             </div>
-        </div>
 
-        <div id="page-shop" class="page hidden">
-            <div class="page-title">Item Shop</div>
-            <div class="page-sub">Configure the current store rotation</div>
-            
-            <div class="card" style="max-width: 600px;">
-                <div class="card-title">Manual Override</div>
-                <label style="font-size: 0.75rem; color: var(--text-dim);">Template ID</label>
-                <input type="text" placeholder="AthenaCharacter:CID_001_Athena_Commando_F_Default">
-                <button class="btn">Update Rotation</button>
+            <div style="display: grid; grid-template-columns: 1fr 350px; gap: 24px;">
+                <div class="card">
+                    <div class="card-title">Live Catalog Items</div>
+                    <div class="shop-grid" id="current-shop-display">
+                        <p style="color: var(--text-dim);">Loading current catalog...</p>
+                    </div>
+                </div>
+
+                <div class="card" style="height: fit-content;">
+                    <div class="card-title">Add New Entry</div>
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Template ID (CID/EID/BID)</label>
+                    <input type="text" id="add-id" placeholder="AthenaCharacter:CID_028_Athena_Commando_F">
+                    
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Price (V-Bucks)</label>
+                    <input type="number" id="add-price" placeholder="1200">
+                    
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Section</label>
+                    <select id="add-section">
+                        <option value="Daily">Daily</option>
+                        <option value="Featured">Featured</option>
+                        <option value="SpecialOffers">Special Offers</option>
+                    </select>
+
+                    <button class="btn-purple" onclick="addItem()">Add to Catalog</button>
+                    <button class="btn-purple" style="margin-top:10px; background: #22c55e;" onclick="saveShop()">📡 Push Live Updates</button>
+                </div>
             </div>
         </div>
 
         <div id="page-tournaments" class="page hidden">
-            <div class="page-title">Tournaments</div>
-            <div class="page-sub">Deploy competitive event windows</div>
+            <div class="page-header">
+                <h1 class="page-title">Tournament Control</h1>
+                <p class="page-sub">Deploy competitive event windows to eventlistactive.json</p>
+            </div>
+
             <div class="card">
-                <div class="card-title">New Event</div>
-                <p style="color: var(--text-dim);">Coming soon: Dynamic event scheduler.</p>
+                <div class="card-title">Event Deployment</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label>Event Name</label>
+                        <input type="text" id="t-name" placeholder="Orbit Cash Cup">
+                        <label>Playlist</label>
+                        <select id="t-playlist">
+                            <option value="Playlist_DefaultSolo">Solo</option>
+                            <option value="Playlist_DefaultDuo">Duo</option>
+                            <option value="Playlist_Arena_Solo">Arena Solo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Prize Description</label>
+                        <input type="text" id="t-prize" placeholder="10,000 V-Bucks">
+                        <label>Duration (Hours)</label>
+                        <input type="number" id="t-hours" placeholder="3">
+                    </div>
+                </div>
+                <button class="btn-purple" style="width: auto;" onclick="deployTournament()">🚀 Start Tournament Session</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Active Schedule</div>
+                <div id="tournament-list">
+                    <p style="color: var(--text-dim);">Fetching live events...</p>
+                </div>
             </div>
         </div>
 
     </main>
 
     <script>
-        // Simple page switcher logic
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                // Handle nav state
-                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
+        // --- PAGE SWITCHING ---
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('page-' + id).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+        }
 
-                // Handle page state
-                const target = item.getAttribute('data-target');
-                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-                document.getElementById(target).classList.remove('hidden');
+        // --- SHOP LOGIC ---
+        let currentItems = [];
+
+        function addItem() {
+            const id = document.getElementById('add-id').value;
+            const price = document.getElementById('add-price').value;
+            const section = document.getElementById('add-section').value;
+            if(!id || !price) return alert("Fill all fields");
+
+            currentItems.push({ id, price, section });
+            renderShop();
+        }
+
+        function renderShop() {
+            const container = document.getElementById('current-shop-display');
+            container.innerHTML = currentItems.map((item, index) => `
+                <div class="shop-item">
+                    <button class="remove-btn" onclick="removeItem(${index})">×</button>
+                    <img src="https://fortnite-api.com/v2/cosmetics/br/${item.id.split(':').pop()}/icon.png" onerror="this.src='https://i.imgur.com/SeK0g54.png'">
+                    <span class="shop-item-name">${item.id.split(':').pop()}</span>
+                    <span class="shop-item-price">${item.price} VB</span>
+                </div>
+            `).join('');
+        }
+
+        function removeItem(index) {
+            currentItems.splice(index, 1);
+            renderShop();
+        }
+
+        async function saveShop() {
+            // This triggers your DashboardController.cs ShopSave endpoint
+            const res = await fetch('/api/shop/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: currentItems })
             });
-        });
+            if(res.ok) alert("Shop Rotated Successfully!");
+        }
 
-        // Placeholder for your backend data fetch
-        async function fetchStats() {
-            // In the future, this calls your Vercel /api routes
-            console.log("Fetching live data from VPS...");
+        // --- TOURNAMENT LOGIC ---
+        async function deployTournament() {
+            const data = {
+                name: document.getElementById('t-name').value,
+                playlist: document.getElementById('t-playlist').value,
+                prize: document.getElementById('t-prize').value
+            };
+            // This triggers your DashboardController.cs TournamentStart endpoint
+            const res = await fetch('/api/tournaments/start', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if(res.ok) alert("Tournament is now LIVE!");
         }
     </script>
-
 </body>
 </html>
