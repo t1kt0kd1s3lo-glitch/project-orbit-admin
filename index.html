@@ -66,12 +66,15 @@
             color: var(--text);
         }
 
-        .logout-box {
+        .bottom-section {
             margin-top: auto;
             background: #1c2127; 
             padding: 15px;
             border-radius: 12px;
             border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .logout-btn {
@@ -82,6 +85,10 @@
             font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
+            border: none;
+            background: none;
+            padding: 0;
+            width: 100%;
         }
 
         .logout-btn:hover { color: var(--danger); }
@@ -159,13 +166,13 @@
         <div class="nav-item active" onclick="showPage('shop')">Item Shop</div>
         <div class="nav-item" onclick="showPage('tournaments')">Tournaments</div>
 
-        <div class="logout-box">
-            <div class="logout-btn" onclick="handleLogout()">
+        <div class="bottom-section">
+            <button class="logout-btn" onclick="handleLogout()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/>
                 </svg>
                 Sign Out
-            </div>
+            </button>
         </div>
     </nav>
 
@@ -270,14 +277,21 @@
         }
 
         function handleLogout() {
-           
-            document.cookie.split(";").forEach(function(c) { 
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-            });
+            // Nuke all cookies on current domain
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+            
+            // Clear local storage
             localStorage.clear();
             sessionStorage.clear();
-            // Go to login/root
-            window.location.href = "/"; 
+
+            // Redirect back to login (root or /login)
+            window.location.replace("/login"); 
         }
     </script>
 </body>
