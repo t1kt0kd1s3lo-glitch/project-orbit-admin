@@ -12,16 +12,13 @@
         }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        /* ── Login Overlay (Shown if no cookie) ── */
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 320px; text-align: center; }
         
-        /* ── Sidebar ── */
         nav { width: var(--sidebar-width); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 15px; box-sizing: border-box; }
         .nav-item { padding: 12px 18px; border-radius: 10px; cursor: pointer; color: var(--text-dim); transition: 0.2s; margin-bottom: 5px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
         .nav-item:hover, .nav-item.active { background: rgba(77, 110, 255, 0.1); color: var(--text); }
         
-        /* ── Bottom Section (Grey Box) ── */
         .bottom-box { margin-top: auto; background: #1c2127; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .sidebar-logo { width: 100%; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(77, 110, 255, 0.3)); }
         .logout-btn { color: var(--text-dim); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: none; width: 100%; }
@@ -29,9 +26,9 @@
 
         main { flex: 1; padding: 40px; overflow-y: auto; }
         .card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-bottom: 24px; }
-        input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; }
+        input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-purple { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
@@ -61,9 +58,9 @@
         <div id="page-shop" class="page">
             <h1 style="margin:0 0 30px 0;">Shop Manager</h1>
             <div class="card">
-                <input type="text" id="in-id" placeholder="Template ID">
+                <input type="text" id="in-id" placeholder="Template ID (CID_...)">
                 <input type="number" id="in-price" placeholder="V-Bucks">
-                <button class="btn-purple" onclick="alert('Item Added')">Add to Catalog</button>
+                <button class="btn-purple" onclick="alert('Sent to backend')">Add to Catalog</button>
             </div>
         </div>
         
@@ -77,22 +74,51 @@
     </main>
 
     <script>
-        // Check if logged in via the orbit_session cookie
+        // Check cookie on load
         if (document.cookie.includes("orbit_session=")) {
             document.getElementById('login-screen').classList.add('hidden');
         }
 
         async function handleLogin() {
             const password = document.getElementById('login-pw').value;
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ password })
-            });
-            if (res.ok) window.location.reload();
-            else alert("Invalid Password");
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const data = await res.json();
+                
+                if (data.ok) {
+                    // Redirect or reload to trigger the hidden class
+                    window.location.reload();
+                } else {
+                    alert("Invalid Password");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to login API");
+            }
         }
 
         async function handleLogout() {
-            // Calls your specific api/logout.js to clear the orbit_session
-            await fetch('/api
+            try {
+                await fetch('/api/logout');
+                // Nuke cookies manually just in case
+                document.cookie = "orbit_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.reload();
+            } catch (err) {
+                window.location.reload();
+            }
+        }
+
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.getElementById('page-' + id).classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
