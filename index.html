@@ -12,6 +12,7 @@
         }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* Login Overlay - Hidden by default until check fails */
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 320px; text-align: center; }
         
@@ -21,7 +22,7 @@
         
         .bottom-box { margin-top: auto; background: #1c2127; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .sidebar-logo { width: 100%; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(77, 110, 255, 0.3)); }
-        .logout-btn { color: var(--text-dim); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: none; width: 100%; padding: 5px 0; }
+        .logout-btn { color: var(--text-dim); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: none; width: 100%; }
         .logout-btn:hover { color: var(--danger); }
 
         main { flex: 1; padding: 40px; overflow-y: auto; }
@@ -33,7 +34,7 @@
 </head>
 <body>
 
-    <div id="login-screen">
+    <div id="login-screen" class="hidden">
         <div class="login-card">
             <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" style="width:180px; margin-bottom:20px;">
             <input type="password" id="login-pw" placeholder="Admin Password">
@@ -44,47 +45,35 @@
     <nav>
         <div class="nav-item active" onclick="showPage('shop')">Item Shop</div>
         <div class="nav-item" onclick="showPage('tournaments')">Tournaments</div>
-
         <div class="bottom-box">
             <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" class="sidebar-logo">
-            <button class="logout-btn" onclick="handleLogout()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/></svg>
-                Sign Out
-            </button>
+            <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
         </div>
     </nav>
 
     <main>
         <div id="page-shop" class="page">
             <h1>Shop Manager</h1>
-            <div class="card">
-                <input type="text" id="in-id" placeholder="Template ID">
-                <input type="number" id="in-price" placeholder="V-Bucks">
-                <button class="btn-purple">Update Catalog</button>
-            </div>
-        </div>
-        
-        <div id="page-tournaments" class="page hidden">
-            <h1>Tournaments</h1>
-            <div class="card">
-                <input type="text" placeholder="Event Name">
-                <button class="btn-purple">Deploy Event</button>
-            </div>
+            <div class="card"><input type="text" placeholder="CID_..."><button class="btn-purple">Update</button></div>
         </div>
     </main>
 
     <script>
-        // Check for session immediately
-        const hasSession = document.cookie.includes("orbit_session=");
-        const isDashboardPath = window.location.pathname === '/dashboard';
-
-        if (isDashboardPath && hasSession) {
-            document.getElementById('login-screen').classList.add('hidden');
-        } else if (isDashboardPath && !hasSession) {
-            window.location.replace("/");
-        } else if (!isDashboardPath && hasSession) {
-            window.location.replace("/dashboard");
+        // ── ACTUAL SESSION CHECK ──
+        // We ping the API. If we get a 401, we show the login screen.
+        async function checkAuth() {
+            const res = await fetch('/api/shop');
+            if (res.status === 401) {
+                if (window.location.pathname === '/dashboard') {
+                    window.location.replace('/'); // Kick to home if on dashboard unauthed
+                } else {
+                    document.getElementById('login-screen').classList.remove('hidden');
+                }
+            } else if (window.location.pathname !== '/dashboard') {
+                window.location.replace('/dashboard'); // Go to dashboard if authed on home
+            }
         }
+        checkAuth();
 
         async function handleLogin() {
             const password = document.getElementById('login-pw').value;
@@ -93,25 +82,17 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password })
             });
-            
             const data = await res.json();
             if (data.ok) {
-                // Moving to the official /dashboard URL
-                window.location.replace("/dashboard");
+                window.location.href = "/dashboard";
             } else {
                 alert("Invalid Password");
             }
         }
 
         async function handleLogout() {
-            try {
-                await fetch('/api/logout');
-                // Force nuke the cookie
-                document.cookie = "orbit_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.replace("/");
-            } catch (err) {
-                window.location.replace("/");
-            }
+            await fetch('/api/logout');
+            window.location.replace("/");
         }
 
         function showPage(id) {
