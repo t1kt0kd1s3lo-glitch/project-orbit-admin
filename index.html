@@ -12,13 +12,16 @@
         }
         body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
+        /* ── Login Overlay ── */
         #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
         .login-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 320px; text-align: center; }
         
+        /* ── Sidebar ── */
         nav { width: var(--sidebar-width); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 15px; box-sizing: border-box; }
         .nav-item { padding: 12px 18px; border-radius: 10px; cursor: pointer; color: var(--text-dim); transition: 0.2s; margin-bottom: 5px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
         .nav-item:hover, .nav-item.active { background: rgba(77, 110, 255, 0.1); color: var(--text); }
         
+        /* ── Grey Bottom Box (Logo + Logout) ── */
         .bottom-box { margin-top: auto; background: #1c2127; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
         .sidebar-logo { width: 100%; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(77, 110, 255, 0.3)); }
         .logout-btn { color: var(--text-dim); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: none; width: 100%; }
@@ -26,7 +29,7 @@
 
         main { flex: 1; padding: 40px; overflow-y: auto; }
         .card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-bottom: 24px; }
-        input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
+        input { width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; outline: none; }
         .btn-purple { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; }
         .hidden { display: none !important; }
     </style>
@@ -47,70 +50,46 @@
 
         <div class="bottom-box">
             <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" class="sidebar-logo">
-            <button class="logout-btn" onclick="handleLogout()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/></svg>
-                Sign Out
-            </button>
+            <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
         </div>
     </nav>
 
     <main>
         <div id="page-shop" class="page">
-            <h1 style="margin:0 0 30px 0;">Shop Manager</h1>
-            <div class="card">
-                <input type="text" id="in-id" placeholder="Template ID (CID_...)">
-                <input type="number" id="in-price" placeholder="V-Bucks">
-                <button class="btn-purple" onclick="alert('Sent to backend')">Add to Catalog</button>
-            </div>
-        </div>
-        
-        <div id="page-tournaments" class="page hidden">
-            <h1 style="margin:0 0 30px 0;">Tournaments</h1>
-            <div class="card">
-                <input type="text" placeholder="Event Name">
-                <button class="btn-purple">Deploy Event</button>
-            </div>
+            <h1>Shop Manager</h1>
+            <div class="card"><input type="text" placeholder="CID_..."><button class="btn-purple">Update Shop</button></div>
         </div>
     </main>
 
     <script>
-        // Check cookie on load
-        if (document.cookie.includes("orbit_session=")) {
+        // If the URL is /dashboard and we have the cookie, hide login
+        if (window.location.pathname === '/dashboard' && document.cookie.includes("orbit_session=")) {
             document.getElementById('login-screen').classList.add('hidden');
+        } else if (window.location.pathname === '/dashboard') {
+            // Trying to access dashboard without cookie? Force them back to root for login
+            window.location.href = "/";
         }
 
         async function handleLogin() {
             const password = document.getElementById('login-pw').value;
-            try {
-                const res = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password })
-                });
-                
-                const data = await res.json();
-                
-                if (data.ok) {
-                    // Redirect or reload to trigger the hidden class
-                    window.location.reload();
-                } else {
-                    alert("Invalid Password");
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Error connecting to login API");
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password })
+            });
+            const data = await res.json();
+            if (data.ok) {
+                // MOVE TO THE NEW URL
+                window.location.href = "/dashboard";
+            } else {
+                alert("Invalid Password");
             }
         }
 
         async function handleLogout() {
-            try {
-                await fetch('/api/logout');
-                // Nuke cookies manually just in case
-                document.cookie = "orbit_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-                window.location.reload();
-            } catch (err) {
-                window.location.reload();
-            }
+            await fetch('/api/logout');
+            document.cookie = "orbit_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/";
         }
 
         function showPage(id) {
