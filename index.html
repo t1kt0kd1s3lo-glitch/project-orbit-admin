@@ -6,171 +6,52 @@
     <title>Orbit Admin Portal</title>
     <style>
         :root {
-            --bg: #0b0e11;
-            --card: #15191e;
-            --border: #232a31;
-            --accent: #4d6eff;
-            --text: #ffffff;
-            --text-dim: #8b98a5;
-            --danger: #ff4d4d;
-            --success: #4ade80;
-            --sidebar-width: 260px;
+            --bg: #0b0e11; --card: #15191e; --border: #232a31;
+            --accent: #4d6eff; --text: #ffffff; --text-dim: #8b98a5;
+            --danger: #ff4d4d; --sidebar-width: 260px;
         }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', -apple-system, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        nav {
-            width: var(--sidebar-width);
-            background: var(--card);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px 15px;
-            box-sizing: border-box;
-        }
-
-        .nav-logo-container {
-            padding: 10px 0 30px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .sidebar-logo {
-            width: 85%;
-            filter: drop-shadow(0 0 12px rgba(77, 110, 255, 0.4));
-        }
-
-        .nav-item {
-            padding: 12px 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: var(--text-dim);
-            transition: 0.2s;
-            margin-bottom: 5px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .nav-item:hover, .nav-item.active {
-            background: rgba(77, 110, 255, 0.1);
-            color: var(--text);
-        }
-
-        .bottom-section {
-            margin-top: auto;
-            background: #1c2127; 
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .logout-btn {
-            color: var(--text-dim);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            background: none;
-            padding: 0;
-            width: 100%;
-        }
-
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* ── Login Overlay (Shown if no cookie) ── */
+        #login-screen { position: fixed; inset: 0; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: var(--card); padding: 40px; border-radius: 16px; border: 1px solid var(--border); width: 320px; text-align: center; }
+        
+        /* ── Sidebar ── */
+        nav { width: var(--sidebar-width); background: var(--card); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 20px 15px; box-sizing: border-box; }
+        .nav-item { padding: 12px 18px; border-radius: 10px; cursor: pointer; color: var(--text-dim); transition: 0.2s; margin-bottom: 5px; font-weight: 600; display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover, .nav-item.active { background: rgba(77, 110, 255, 0.1); color: var(--text); }
+        
+        /* ── Bottom Section (Grey Box) ── */
+        .bottom-box { margin-top: auto; background: #1c2127; padding: 15px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .sidebar-logo { width: 100%; margin-bottom: 15px; filter: drop-shadow(0 0 8px rgba(77, 110, 255, 0.3)); }
+        .logout-btn { color: var(--text-dim); cursor: pointer; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; background: none; width: 100%; }
         .logout-btn:hover { color: var(--danger); }
 
-        main {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
-
-        .page-header { margin-bottom: 30px; }
-        .page-title { font-size: 2rem; font-weight: 800; margin: 0; }
-        .page-sub { color: var(--text-dim); margin-top: 5px; }
-
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            padding: 24px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-        }
-
-        .card-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            color: var(--text-dim);
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .shop-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 15px;
-        }
-
-        .shop-item {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            position: relative;
-        }
-
-        .shop-item img { width: 100%; border-radius: 8px; margin-bottom: 8px; }
-        
-        .remove-x {
-            position: absolute; top: 5px; right: 5px;
-            background: var(--danger); color: white; border: none;
-            border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 10px;
-        }
-
-        input, select {
-            width: 100%; background: var(--bg); border: 1px solid var(--border);
-            padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box;
-        }
-
-        .btn-purple {
-            background: var(--accent); color: white; border: none;
-            padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%;
-        }
-
+        main { flex: 1; padding: 40px; overflow-y: auto; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 16px; margin-bottom: 24px; }
+        input, select { width: 100%; background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 8px; color: white; margin-bottom: 12px; box-sizing: border-box; }
+        .btn-purple { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-logo-container">
-            <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" alt="ORBIT" class="sidebar-logo">
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" style="width:180px; margin-bottom:20px;">
+            <input type="password" id="login-pw" placeholder="Admin Password">
+            <button class="btn-purple" onclick="handleLogin()">Login</button>
         </div>
+    </div>
 
+    <nav>
         <div class="nav-item active" onclick="showPage('shop')">Item Shop</div>
         <div class="nav-item" onclick="showPage('tournaments')">Tournaments</div>
 
-        <div class="bottom-section">
+        <div class="bottom-box">
+            <img src="https://cdn.discordapp.com/attachments/1467027009363513519/1497426222320451696/bah.png?ex=69ed7a58&is=69ec28d8&hm=da910de3c80a49ddf1f22a86e17964795da1f542bb653683453c698418e567ef" class="sidebar-logo">
             <button class="logout-btn" onclick="handleLogout()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/>
-                </svg>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4m7 14l5-5-5-5m5 5H9"/></svg>
                 Sign Out
             </button>
         </div>
@@ -178,121 +59,40 @@
 
     <main>
         <div id="page-shop" class="page">
-            <div class="page-header">
-                <h1 class="page-title">Shop Manager</h1>
-                <p class="page-sub">Configure live rotation items</p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 320px; gap: 20px;">
-                <div class="card">
-                    <div class="card-title">Live Preview</div>
-                    <div class="shop-grid" id="shop-preview"></div>
-                </div>
-
-                <div class="card">
-                    <div class="card-title">Add Item</div>
-                    <input type="text" id="in-id" placeholder="Template ID">
-                    <input type="number" id="in-price" placeholder="V-Bucks">
-                    <select id="in-section">
-                        <option value="Daily">Daily</option>
-                        <option value="Featured">Featured</option>
-                    </select>
-                    <button class="btn-purple" onclick="addToLocal()">Add to List</button>
-                    <button class="btn-purple" style="margin-top:10px; background: var(--success);" onclick="pushShopLive()">Push Shop Live</button>
-                </div>
+            <h1 style="margin:0 0 30px 0;">Shop Manager</h1>
+            <div class="card">
+                <input type="text" id="in-id" placeholder="Template ID">
+                <input type="number" id="in-price" placeholder="V-Bucks">
+                <button class="btn-purple" onclick="alert('Item Added')">Add to Catalog</button>
             </div>
         </div>
-
+        
         <div id="page-tournaments" class="page hidden">
-            <div class="page-header">
-                <h1 class="page-title">Tournament Control</h1>
-                <p class="page-sub">Modify eventlistactive.json</p>
-            </div>
-            
+            <h1 style="margin:0 0 30px 0;">Tournaments</h1>
             <div class="card">
-                <div class="card-title">New Event</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <input type="text" id="t-name" placeholder="Event Name">
-                    <select id="t-playlist">
-                        <option value="Playlist_DefaultSolo">Solo</option>
-                        <option value="Playlist_DefaultDuo">Duo</option>
-                        <option value="Playlist_Arena_Solo">Arena Solo</option>
-                    </select>
-                </div>
-                <button class="btn-purple" onclick="deployTournament()">Deploy Event</button>
+                <input type="text" placeholder="Event Name">
+                <button class="btn-purple">Deploy Event</button>
             </div>
         </div>
     </main>
 
     <script>
-        let shopList = [];
-
-        function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('page-' + id).classList.remove('hidden');
-            event.currentTarget.classList.add('active');
+        // Check if logged in via the orbit_session cookie
+        if (document.cookie.includes("orbit_session=")) {
+            document.getElementById('login-screen').classList.add('hidden');
         }
 
-        function addToLocal() {
-            const id = document.getElementById('in-id').value;
-            const price = document.getElementById('in-price').value;
-            const section = document.getElementById('in-section').value;
-            if(!id || !price) return;
-            shopList.push({ id, price, section });
-            renderPreview();
-            document.getElementById('in-id').value = "";
-        }
-
-        function renderPreview() {
-            const container = document.getElementById('shop-preview');
-            container.innerHTML = shopList.map((item, i) => `
-                <div class="shop-item">
-                    <button class="remove-x" onclick="shopList.splice(${i},1);renderPreview()">×</button>
-                    <img src="https://fortnite-api.com/v2/cosmetics/br/${item.id.split(':').pop()}/icon.png" onerror="this.src='https://i.imgur.com/SeK0g54.png'">
-                    <div style="font-size:0.7rem; margin-top:5px; color:var(--text-dim);">${item.id.split(':').pop()}</div>
-                    <div style="color:var(--accent); font-size:0.85rem; font-weight:700;">${item.price} VB</div>
-                </div>
-            `).join('');
-        }
-
-        async function pushShopLive() {
-            const res = await fetch('/api/shop/save', {
+        async function handleLogin() {
+            const password = document.getElementById('login-pw').value;
+            const res = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items: shopList })
+                body: JSON.stringify({ password })
             });
-            if(res.ok) alert("Shop Pushed!");
+            if (res.ok) window.location.reload();
+            else alert("Invalid Password");
         }
 
-        async function deployTournament() {
-            const name = document.getElementById('t-name').value;
-            const playlist = document.getElementById('t-playlist').value;
-            const res = await fetch('/api/tournaments/start', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, playlist })
-            });
-            if(res.ok) alert("Tournament Deployed!");
-        }
-
-        function handleLogout() {
-            // Nuke all cookies on current domain
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i];
-                const eqPos = cookie.indexOf("=");
-                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-            }
-            
-            // Clear local storage
-            localStorage.clear();
-            sessionStorage.clear();
-
-            // Redirect back to login (root or /login)
-            window.location.replace("/login"); 
-        }
-    </script>
-</body>
-</html>
+        async function handleLogout() {
+            // Calls your specific api/logout.js to clear the orbit_session
+            await fetch('/api
