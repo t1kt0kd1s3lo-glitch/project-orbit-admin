@@ -5,79 +5,112 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Orbit Dashboard</title>
   <style>
-    /* ── Calm Base Styles ── */
     :root {
-      --bg: #0d0f14; /* Deep, neutral dark */
-      --panel: #161b27; /* Distinct card background */
-      --border: #2a3044; /* Subtle borders */
-      --accent: #4d6eff; /* Professional blue */
+      --bg: #0d0f14;
+      --panel: #161b27;
+      --border: #2a3044;
+      --accent: #4d6eff;
       --text: #e2e8f0;
       --text-dim: #64748b;
-      --green: #4ade80;
       --red: #f87171;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'Segoe UI', system-ui, sans-serif; 
-      background: var(--bg); 
-      color: var(--text); 
-      min-height: 100vh;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── Calm Login ── */
+    /* ── Login Screen (Restored) ── */
     #login-screen { 
-      display: flex; align-items: center; justify-content: center; min-height: 100vh; 
-      background: var(--bg);
+      display: flex; align-items: center; justify-content: center; 
+      position: fixed; inset: 0; z-index: 999; background: var(--bg);
     }
     .login-box { 
       background: var(--panel); border: 1px solid var(--border); border-radius: 12px; 
       padding: 40px; width: 100%; max-width: 380px; text-align: center;
     }
     .login-box .logo { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-    .login-box p { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 24px; }
     .login-box input { 
       width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); 
       border-radius: 8px; color: #fff; margin-bottom: 16px; outline: none;
     }
 
-    /* ── Basic Sidebar Layout ── */
-    #app { display: none; min-height: 100vh; }
-    .sidebar { 
-      position: fixed; width: 220px; height: 100vh; background: var(--panel); 
-      border-right: 1px solid var(--border); display: flex; flex-direction: column; 
-    }
+    /* ── Sidebar Layout ── */
+    #app { display: none; }
+    .sidebar { position: fixed; width: 220px; height: 100vh; background: var(--panel); border-right: 1px solid var(--border); }
     .sidebar-logo { padding: 24px; font-size: 1.2rem; font-weight: 800; border-bottom: 1px solid var(--border); }
-    .nav-item { 
-      padding: 14px 24px; cursor: pointer; color: var(--text-dim); transition: 0.2s; 
-      font-weight: 500; display: flex; align-items: center; gap: 10px;
-    }
-    .nav-item:hover { background: #1e2436; color: #fff; }
-    .nav-item.active { color: var(--accent); background: #1e2436; border-left: 3px solid var(--accent); }
-
+    
     .main { margin-left: 220px; padding: 40px; }
-    .page { display: none; }
-    .page.active { display: block; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
 
-    /* ── Standard Cards ── */
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
-    .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 20px; color: #fff; }
-
-    /* ── Clean Form Elements ── */
-    .btn { 
-      padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; 
-      border: none; transition: opacity 0.2s; font-size: 0.9rem;
-    }
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
     .btn-primary { background: var(--accent); color: #fff; }
-    .btn-secondary { background: #1e2436; color: var(--text-dim); border: 1px solid var(--border); }
-    .btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
 
-    /* ── Shop Grid ── */
-    .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .shop-item { 
-      background: var(--bg); border: 1px solid var(--border); border-radius: 10px; 
-      padding: 16px; position: relative;
+<div id="login-screen">
+  <div class="login-box">
+    <div class="logo">Orbit</div>
+    <p style="color: var(--text-dim); margin-bottom: 24px;">Admin Portal</p>
+    <input type="password" id="pwd-input" placeholder="Password" />
+    <button class="btn btn-primary" style="width:100%" id="login-btn">Sign In</button>
+    <div id="login-error" style="color: var(--red); font-size: 0.8rem; margin-top: 10px;"></div>
+  </div>
+</div>
+
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-logo">Orbit Admin</div>
+    <nav style="padding-top: 20px;">
+        <div style="padding: 12px 24px; color: var(--accent); background: #1e2436; font-weight: 600;">Dashboard</div>
+    </nav>
+  </aside>
+  <main class="main">
+    <div class="card">
+      <h2>Welcome back.</h2>
+      <p style="color: var(--text-dim); margin-top: 8px;">System is operational.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+  const loginScreen = document.getElementById('login-screen');
+  const appScreen = document.getElementById('app');
+
+  function showLogin() {
+    loginScreen.style.display = 'flex';
+    appScreen.style.display = 'none';
+  }
+
+  function showApp() {
+    loginScreen.style.display = 'none';
+    appScreen.style.display = 'block';
+  }
+
+  // Handle Login
+  document.getElementById('login-btn').addEventListener('click', async () => {
+    const password = document.getElementById('pwd-input').value;
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+
+    if (res.ok) {
+      showApp();
+    } else {
+      document.getElementById('login-error').innerText = "Invalid credentials.";
     }
-    .shop-item-name { font-weight: 600; margin-bottom: 4px; }
-    .shop-item-id { font-size: 0.75rem; color: var(--text-dim); margin-bottom: 12px; word-break: break-all; }
-    .shop-item-price { color: #a78bfa; font-weight: 700; }
+  });
+
+  // Check session on boot
+  (async () => {
+    const res = await fetch('/api/shop'); // If this returns 200, we're logged in
+    if (res.ok) {
+      showApp();
+    } else {
+      showLogin();
+    }
+  })();
+</script>
+</body>
+</html>
