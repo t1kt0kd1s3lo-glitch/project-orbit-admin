@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import cookie from "cookie";
 
 const SECRET = process.env.JWT_SECRET || "changeme";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Ly77mlsm1@";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "cxqmic";
 
 export default function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
