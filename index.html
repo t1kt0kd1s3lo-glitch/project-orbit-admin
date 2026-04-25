@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Orbit Dashboard</title>
+  <title>Orbit Admin</title>
   <style>
     :root {
       --bg: #0d0f14;
@@ -18,31 +18,35 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── Login Screen (Restored) ── */
-    #login-screen { 
-      display: flex; align-items: center; justify-content: center; 
-      position: fixed; inset: 0; z-index: 999; background: var(--bg);
-    }
-    .login-box { 
-      background: var(--panel); border: 1px solid var(--border); border-radius: 12px; 
-      padding: 40px; width: 100%; max-width: 380px; text-align: center;
-    }
-    .login-box .logo { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
-    .login-box input { 
-      width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); 
-      border-radius: 8px; color: #fff; margin-bottom: 16px; outline: none;
-    }
+    /* ── Login ── */
+    #login-screen { display: flex; align-items: center; justify-content: center; position: fixed; inset: 0; z-index: 999; background: var(--bg); }
+    .login-box { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 40px; width: 100%; max-width: 380px; text-align: center; }
+    .login-box input { width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: #fff; margin-bottom: 16px; outline: none; }
 
-    /* ── Sidebar Layout ── */
+    /* ── Sidebar ── */
     #app { display: none; }
     .sidebar { position: fixed; width: 220px; height: 100vh; background: var(--panel); border-right: 1px solid var(--border); }
     .sidebar-logo { padding: 24px; font-size: 1.2rem; font-weight: 800; border-bottom: 1px solid var(--border); }
-    
-    .main { margin-left: 220px; padding: 40px; }
-    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .nav-item { padding: 14px 24px; cursor: pointer; color: var(--text-dim); font-weight: 600; transition: 0.2s; }
+    .nav-item:hover { color: #fff; background: #1e2436; }
+    .nav-item.active { color: var(--accent); background: #1e2436; border-left: 3px solid var(--accent); }
 
-    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+    /* ── Main Content ── */
+    .main { margin-left: 220px; padding: 40px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+    
+    /* ── Controls ── */
+    .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.9rem; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.8; }
     .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost { background: #1e2436; color: var(--text-dim); border: 1px solid var(--border); }
+    
+    /* ── Shop Grid ── */
+    .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; margin-top: 20px; }
+    .shop-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 15px; position: relative; }
+    .remove-item { position: absolute; top: 10px; right: 10px; color: var(--red); cursor: pointer; background: none; border: none; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -53,7 +57,6 @@
     <p style="color: var(--text-dim); margin-bottom: 24px;">Admin Portal</p>
     <input type="password" id="pwd-input" placeholder="Password" />
     <button class="btn btn-primary" style="width:100%" id="login-btn">Sign In</button>
-    <div id="login-error" style="color: var(--red); font-size: 0.8rem; margin-top: 10px;"></div>
   </div>
 </div>
 
@@ -61,32 +64,47 @@
   <aside class="sidebar">
     <div class="sidebar-logo">Orbit Admin</div>
     <nav style="padding-top: 20px;">
-        <div style="padding: 12px 24px; color: var(--accent); background: #1e2436; font-weight: 600;">Dashboard</div>
+      <div class="nav-item active" onclick="showPage('shop')">Shop</div>
+      <div class="nav-item" onclick="showPage('tournament')">Tournament</div>
     </nav>
   </aside>
+
   <main class="main">
-    <div class="card">
-      <h2>Welcome back.</h2>
-      <p style="color: var(--text-dim); margin-top: 8px;">System is operational.</p>
+    <div class="page active" id="page-shop">
+      <div class="card">
+        <h2>Item Shop Control</h2>
+        <div style="display:flex; gap:10px; margin-top:15px;">
+          <button class="btn btn-primary" onclick="saveShop()">Save Shop</button>
+          <button class="btn btn-ghost" onclick="rotateShop()">Rotate Shop Now</button>
+        </div>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </div>
+
+    <div class="page" id="page-tournament">
+      <div class="card">
+        <h2>Tournament Manager</h2>
+        <p style="color: var(--text-dim); margin-top: 10px;">Create and end active events.</p>
+        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px; max-width: 400px;">
+            <input type="text" id="t-name" placeholder="Tournament Name" style="padding: 10px; border-radius: 8px; background: var(--bg); border: 1px solid var(--border); color: white;">
+            <button class="btn btn-primary" onclick="startTournament()">Start Tournament</button>
+            <button class="btn btn-ghost" style="color: var(--red); border-color: var(--red);" onclick="endTournament()">End Tournament</button>
+        </div>
+      </div>
     </div>
   </main>
 </div>
 
 <script>
-  const loginScreen = document.getElementById('login-screen');
-  const appScreen = document.getElementById('app');
-
-  function showLogin() {
-    loginScreen.style.display = 'flex';
-    appScreen.style.display = 'none';
+  // Navigation
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    event.target.classList.add('active');
   }
 
-  function showApp() {
-    loginScreen.style.display = 'none';
-    appScreen.style.display = 'block';
-  }
-
-  // Handle Login
+  // Auth Logic
   document.getElementById('login-btn').addEventListener('click', async () => {
     const password = document.getElementById('pwd-input').value;
     const res = await fetch('/api/login', {
@@ -94,23 +112,34 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
     });
-
-    if (res.ok) {
-      showApp();
-    } else {
-      document.getElementById('login-error').innerText = "Invalid credentials.";
-    }
+    if (res.ok) { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; loadShop(); }
   });
 
-  // Check session on boot
-  (async () => {
-    const res = await fetch('/api/shop'); // If this returns 200, we're logged in
-    if (res.ok) {
-      showApp();
-    } else {
-      showLogin();
-    }
-  })();
+  // Shop Logic
+  async function loadShop() {
+    const res = await fetch('/api/shop');
+    const data = await res.json();
+    const grid = document.getElementById('shop-grid');
+    grid.innerHTML = '';
+    data.storefronts.forEach(sf => {
+        sf.catalogEntries.forEach(entry => {
+            const item = document.createElement('div');
+            item.className = 'shop-item';
+            item.innerHTML = `<strong>${entry.devName || 'Unknown Item'}</strong><br><span style="color:var(--text-dim); font-size:0.8rem;">${entry.offerId}</span><br><br><span style="color:var(--accent)">${entry.prices[0].finalPrice} V-Bucks</span>`;
+            grid.appendChild(item);
+        });
+    });
+  }
+
+  async function rotateShop() { await fetch('/api/shop', { method: 'PUT' }); loadShop(); }
+  async function saveShop() { /* Logic for POST to /api/shop */ }
+
+  // Tournament Logic
+  async function startTournament() {
+    const name = document.getElementById('t-name').value;
+    await fetch('/api/tournament', { method: 'POST', body: JSON.stringify({ name, start: new Date().toISOString(), end: new Date(Date.now() + 86400000).toISOString() }), headers: {'Content-Type': 'application/json'} });
+  }
+  async function endTournament() { await fetch('/api/tournament', { method: 'DELETE' }); }
 </script>
 </body>
 </html>
