@@ -1,41 +1,209 @@
-<div class="nav-item" onclick="showPage('news')">News Feed</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbit Admin Portal</title>
+    <style>
+        /* This CSS mimics the dark-mode variables I saw in your project files */
+        :root {
+            --bg: #0b0e11;
+            --card: #15191e;
+            --border: #232a31;
+            --accent: #4d6eff;
+            --text: #ffffff;
+            --text-dim: #8b98a5;
+        }
 
-<div class="page" id="page-news">
-  <div class="card">
-    <div class="card-title">Broadcast News</div>
-    <div class="form-group" style="margin-bottom:15px">
-      <label style="color:var(--text-dim); font-size:0.8rem; display:block; margin-bottom:5px;">Header Title</label>
-      <input type="text" id="news-title" placeholder="e.g. V0.0.1 UPDATE IS LIVE!" style="width:100%; padding:10px; background:#0d0f14; border:1px solid var(--border); color:white; border-radius:8px;">
-    </div>
-    <div class="form-group" style="margin-bottom:15px">
-      <label style="color:var(--text-dim); font-size:0.8rem; display:block; margin-bottom:5px;">Content Body</label>
-      <textarea id="news-body" placeholder="Describe the update..." style="width:100%; height:100px; padding:10px; background:#0d0f14; border:1px solid var(--border); color:white; border-radius:8px; resize:none;"></textarea>
-    </div>
-    <div class="form-group" style="margin-bottom:15px">
-      <label style="color:var(--text-dim); font-size:0.8rem; display:block; margin-bottom:5px;">Image URL (1024x512)</label>
-      <input type="text" id="news-image" placeholder="https://i.imgur.com/your-image.png" style="width:100%; padding:10px; background:#0d0f14; border:1px solid var(--border); color:white; border-radius:8px;">
-    </div>
-    <button class="btn btn-purple" onclick="pushNews()">📡 Push News Update</button>
-  </div>
-</div>
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+        }
 
-<script>
-  // Add this to your script section
-  async function pushNews() {
-    const title = document.getElementById('news-title').value;
-    const body = document.getElementById('news-body').value;
-    const image = document.getElementById('news-image').value;
+        /* Sidebar */
+        nav {
+            width: 240px;
+            background: var(--card);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
 
-    const res = await fetch('/api/news', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, body, image })
-    });
+        .nav-logo {
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            color: var(--accent);
+        }
 
-    if (res.ok) {
-      alert("News Pushed Successfully!");
-    } else {
-      alert("Failed to push news.");
-    }
-  }
-</script>
+        .nav-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: 0.2s;
+            margin-bottom: 5px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(77, 110, 255, 0.1);
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .page-sub {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+
+        /* Cards & Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .card-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        /* Forms */
+        input, textarea {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-logo">ORBIT</div>
+        <div class="nav-item active" data-target="page-home">Overview</div>
+        <div class="nav-item" data-target="page-shop">Shop Manager</div>
+        <div class="nav-item" data-target="page-tournaments">Tournaments</div>
+        <div class="nav-item" data-target="page-users">User Lookup</div>
+    </nav>
+
+    <main>
+        
+        <div id="page-home" class="page">
+            <div class="page-title">Server Overview</div>
+            <div class="page-sub">Live analytics from your C# backend</div>
+            
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Players Online</div>
+                    <div class="stat" id="stat-online">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Total Accounts</div>
+                    <div class="stat" id="stat-total">0</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Uptime</div>
+                    <div class="stat" style="font-size: 1.5rem; margin-top: 10px;">99.9%</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-shop" class="page hidden">
+            <div class="page-title">Item Shop</div>
+            <div class="page-sub">Configure the current store rotation</div>
+            
+            <div class="card" style="max-width: 600px;">
+                <div class="card-title">Manual Override</div>
+                <label style="font-size: 0.75rem; color: var(--text-dim);">Template ID</label>
+                <input type="text" placeholder="AthenaCharacter:CID_001_Athena_Commando_F_Default">
+                <button class="btn">Update Rotation</button>
+            </div>
+        </div>
+
+        <div id="page-tournaments" class="page hidden">
+            <div class="page-title">Tournaments</div>
+            <div class="page-sub">Deploy competitive event windows</div>
+            <div class="card">
+                <div class="card-title">New Event</div>
+                <p style="color: var(--text-dim);">Coming soon: Dynamic event scheduler.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Simple page switcher logic
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                // Handle nav state
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                // Handle page state
+                const target = item.getAttribute('data-target');
+                document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+                document.getElementById(target).classList.remove('hidden');
+            });
+        });
+
+        // Placeholder for your backend data fetch
+        async function fetchStats() {
+            // In the future, this calls your Vercel /api routes
+            console.log("Fetching live data from VPS...");
+        }
+    </script>
+
+</body>
+</html>
